@@ -11,19 +11,42 @@ struct GitHubAPI: APICodable {
 
     var baseURL: URL {
 
-        return URL(string: "https://api.github.com/")
+        return URL(string: "https://api.github.com")
+    }
+
+    var query: Query {
+
+        let query = Query()
+        query.add("access_token", "xxx-xxx-xxx")
+        return query
     }
 }
 
 struct User: Codable {
 
-    var id: Int
-    var name: String
+    let id: Int
+    let name: String
+    let login: String
+}
+
+struct Event: Codable {
+
+    let id: String
+    let createdAt: Date
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case createdAt = "created_at"
+    }
 }
 ```
 
 Then you can fetch the data like below:
 
 ```swift
-var user = GitHubAPI.get(User.self)
+var user = GitHubAPI.get(User.self, to: "/user")
+let eventQuery = Query()
+eventQuery.add("page", 1)
+eventQuery.add("per_page", 20)
+var events = GitHubAPI.get(Event.self, to: "/users/\(user.login)/received_events", with: eventQuery)
 ```
