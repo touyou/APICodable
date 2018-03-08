@@ -9,11 +9,15 @@ First, you have to make api structure applied APICodable and response structure 
 ```swift
 struct GitHubAPI: APICodable {
 
-    var baseURL: URL {
+    static let shared = GitHubAPI()
 
-        return URL(string: "https://api.github.com")
+    // You must set baseURLString
+    var baseURLString: String {
+
+        return "https://api.github.com"
     }
 
+    // You may implement query. This will apply for all request.
     var query: Query {
 
         let query = Query()
@@ -44,9 +48,11 @@ struct Event: Codable {
 Then you can fetch the data like below:
 
 ```swift
-var user = GitHubAPI.get(User.self, to: "/user")
+var user = GitHubAPI.shared.get(User.self, to: "/user")
+
+// You can add customized query like this:
 let eventQuery = Query()
 eventQuery.add("page", 1)
 eventQuery.add("per_page", 20)
-var events = GitHubAPI.get(Event.self, to: "/users/\(user.login)/received_events", with: eventQuery)
+var events = GitHubAPI.shared.get(Event.self, to: "/users/\(user.login)/received_events", with: eventQuery)
 ```
