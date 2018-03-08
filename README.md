@@ -26,6 +26,31 @@ struct GitHubAPI: APICodable {
     }
 }
 
+enum Request: APIRequest {
+    case user
+    case events
+
+    var type: Codable.Type {
+
+        switch self {
+        case .user:
+            return User.self
+        case .events(_):
+            return [Event].self
+        }
+    }
+
+    var requestPath: String {
+
+        switch self {
+        case .user:
+            return "/user"
+        case .events(let loginName):
+            return "/users/\(loginName)/received_events"
+        }
+    }
+}
+
 struct User: Codable {
 
     let id: Int
@@ -48,11 +73,11 @@ struct Event: Codable {
 Then you can fetch the data like below:
 
 ```swift
-var user = GitHubAPI.shared.get(User.self, to: "/user")
+var user = GitHubAPI.shared.get(.user)
 
 // You can add customized query like this:
 let eventQuery = Query()
 eventQuery.add("page", 1)
 eventQuery.add("per_page", 20)
-var events = GitHubAPI.shared.get(Event.self, to: "/users/\(user.login)/received_events", with: eventQuery)
+var events = GitHubAPI.shared.get(.events(user.login), with: eventQuery)
 ```
