@@ -28,7 +28,7 @@ struct GitHubAPI: APICodable {
 
 enum Request: APIRequest {
     case user
-    case events
+    case events(String)
 
     var type: Codable.Type {
 
